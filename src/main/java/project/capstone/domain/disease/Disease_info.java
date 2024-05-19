@@ -15,7 +15,7 @@ public class Disease_info {
 
     private String name;
 
-    @Lob
+    @Column(length = 1000)
     private String description;
 
     public Disease_info(String name, String description) {
