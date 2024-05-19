@@ -1,16 +1,11 @@
 package project.capstone.api;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.capstone.domain.api.PredictionResponse;
-import project.capstone.service.ChatbotService;
 import project.capstone.service.PetService;
 import reactor.core.publisher.Mono;
 
@@ -27,7 +22,6 @@ public class HomeController {
     private static final String FASTAPI_URL = "http://localhost:8000";
     private final WebClient webClient = WebClient.builder().baseUrl(FASTAPI_URL).build();
     private final PetService petService;
-    private final ChatbotService chatbotService;
 
     @GetMapping("/hello")
     public String hello(){
@@ -53,22 +47,10 @@ public class HomeController {
         return response;
     }
 
-    // http://172.30.1.88:8080/api2 집 기준
-//    @PostMapping("/api2")
-//    public Mono<String> api2(@RequestParam("file") MultipartFile file) throws IOException {
-//        return petService.ModelResultWithImage(file);
-//    }
-
     @PostMapping("/api2")
-    public String api2(@RequestParam("file") MultipartFile file) throws IOException {
-        return "ok";
+    public Mono<String> api2(@RequestParam("file") MultipartFile file) throws IOException {
+        return petService.ModelResultWithImage(file);
     }
-
-//    @PostMapping("/chatbot")
-//    public String chatbot(@RequestParam("request") String request){
-//        chatbotService.getResponse(request);
-//        return "ok";
-//    }
 
 }
 
