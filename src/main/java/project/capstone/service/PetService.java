@@ -29,7 +29,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PetService {
 
     private final PetJpaRepository petJpaRepository;
@@ -49,7 +49,7 @@ public class PetService {
         return savedPet;
     }
 
-    public Mono<String> ModelResultWithImage(MultipartFile file) throws IOException {
+    public Mono<String> ModelResultWithImage(MultipartFile file, String url) throws IOException {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", new ByteArrayResource(file.getBytes()) {
             @Override
@@ -61,7 +61,7 @@ public class PetService {
         try {
             Mono<String> result = webClient
                     .post()
-                    .uri("/predict2")
+                    .uri(url)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .bodyValue(multipartBodyBuilder.build())
                     .retrieve()
@@ -72,6 +72,7 @@ public class PetService {
                 try {
                     ObjectNode jsonNode = (ObjectNode) objectMapper.readTree(s1);
                     s2.ifPresent(diseaseInfo -> jsonNode.put("description", diseaseInfo.getDescription()));
+                    log.info("success");
                     return jsonNode.toString();
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
@@ -90,6 +91,7 @@ public class PetService {
             try {
                 JsonNode jsonNode = objectMapper.readTree(json);
                 String disease_name = jsonNode.path("disease_name").asText();
+                log.info(disease_name);
                 return Mono.fromCallable(() -> diseaseRepository.findByName(disease_name))
                         .subscribeOn(Schedulers.boundedElastic());
             } catch (JsonProcessingException e) {
