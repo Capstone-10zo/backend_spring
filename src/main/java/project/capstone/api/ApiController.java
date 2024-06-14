@@ -16,9 +16,9 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // 모든 도메인에서의 접근을 허용
+@CrossOrigin // 모든 도메인에서의 접근을 허용
 //172.30.1.88
-public class HomeController {
+public class ApiController {
     private static final String FASTAPI_URL = "http://localhost:8000";
     private final WebClient webClient = WebClient.builder().baseUrl(FASTAPI_URL).build();
     private final PetService petService;
@@ -49,7 +49,14 @@ public class HomeController {
 
     @PostMapping("/api2")
     public Mono<String> api2(@RequestParam("file") MultipartFile file) throws IOException {
-        return petService.ModelResultWithImage(file);
+        log.info("hello");
+        return petService.ModelResultWithImage(file, "/predict2");
+    }
+
+    @PostMapping("/api3")
+    public Mono<String> api3(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("hello");
+        return petService.ModelResultWithImage(file, "/skin_diag");
     }
 
 }
